@@ -95,6 +95,16 @@ function executeC (cpu, inst) {
   store(cpu, alu, inst)
   jump(cpu, alu, inst)
 }
+var WIDTH = 512
+var HEIGHT = 256
+var PX_SIZE = 1
+if (typeof window !== 'undefined') {
+  var canvas = document.createElement('canvas')
+  canvas.width = WIDTH * PX_SIZE
+  canvas.height = HEIGHT * PX_SIZE
+  document.body.appendChild(canvas)
+  console.log('ea', canvas)
+}
 module.exports = {
   alu, RAM, CPU, Memory
 }

@@ -64,9 +64,6 @@ function RAM () {
 
 “The Hack platform can be connected to two peripheral devices: a screen and a keyboard. Both devices interact with the computer platform through memory maps. ”
 
-#### Screen
-
-“The Hack computer includes a black-and-white screen organized as 256 rows of 512 pixels per row. The screen’s contents are represented by an 8K memory map that starts at RAM address 16384”
 
 ```js
 var RAM_MASK = 1 << 14
@@ -213,8 +210,27 @@ function executeC (cpu, inst) {
 }
 ```
 
+#### Screen
 
-## The End
+“The Hack computer includes a black-and-white screen organized as 256 rows of 512 pixels per row. The screen’s contents are represented by an 8K memory map that starts at RAM address 16384”
+
+```js
+var WIDTH = 512
+var HEIGHT = 256
+```
+
+## App
+
+```js
+var PX_SIZE = 1
+if (typeof window !== 'undefined') {
+  var canvas = document.createElement('canvas')
+  canvas.width = WIDTH * PX_SIZE
+  canvas.height = HEIGHT * PX_SIZE
+  document.body.appendChild(canvas)
+  console.log('ea', canvas)
+}
+```
 
 ```js
 module.exports = {
