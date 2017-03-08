@@ -1,13 +1,6 @@
-
 /**
  * Translates Hack assembly language mnemonics into binary codes.
  */
-module.exports = { dest, comp, jump }
-
-function dest (value) { return DEST[value] }
-function comp (value) { return COMP[value] }
-function jump (value) { return JUMP[value] }
-
 var DEST = {
   '': '000',
   'M': '001',
@@ -65,3 +58,10 @@ const JUMP = {
   'JLE': '110',
   'JMP': '111'
 }
+
+const Code = {
+  dest: (value) => DEST[value],
+  comp: (value) => COMP[value],
+  jump: (value) => JUMP[value]
+}
+module.exports = Code
