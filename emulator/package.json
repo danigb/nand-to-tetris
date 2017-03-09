@@ -1,0 +1,13 @@
+{
+  "name": "emulator",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest test/*"
+  },
+  "dependencies": {
+    "assembler": "file:///Users/Dani/Code/Js16/nand-to-tetris/assembler"
+  }
+}

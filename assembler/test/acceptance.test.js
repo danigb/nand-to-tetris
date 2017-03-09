@@ -1,7 +1,7 @@
 /* global test expect */
 const { readFileSync } = require('fs')
 const { join } = require('path')
-const { assemble } = require('../assemble')
+const { assemble } = require('../src/assemble')
 
 var FILENAMES = ['Add', 'Max', 'MaxL', 'Pong', 'PongL', 'Rect', 'RectL']
 

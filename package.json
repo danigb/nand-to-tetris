@@ -1,12 +1,26 @@
 {
   "name": "nand-to-tetris",
-  "version": "1.0.0",
   "private": true,
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "browserify -t babelify -g uglifyify -p bundle-collapser/plugin emulator/index.js | uglifyjs > docs/demo/bundle.js",
+    "watch": "watchify -t babelify emulator/index.js -o docs/demo/bundle.js",
+    "rollup:build": "rollup -cf iife -i emulator/index.js -o docs/demo/bundle.js",
+    "rollup:watch": "rollup --watch -cf iife -i emulator/index.js -o docs/demo/bundle.js"
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "babel-plugin-transform-react-jsx": "^6.23.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babelify": "^7.3.0",
+    "browserify": "^14.1.0",
+    "bundle-collapser": "^1.2.1",
+    "hyperapp": "^0.7.1",
+    "uglifyify": "^3.0.4",
+    "uglifyjs": "^2.4.10"
+  }
 }

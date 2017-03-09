@@ -1,5 +1,5 @@
 /* global describe it expect */
-var Parser = require('../parser')
+var Parser = require('../src/parser')
 
 describe('Parser', () => {
   it('check if has more commands', () => {
