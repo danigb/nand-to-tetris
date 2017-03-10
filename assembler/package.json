@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "description": "",
-  "main": "src/assemble.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest test/*"
   }
