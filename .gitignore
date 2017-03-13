@@ -6,3 +6,4 @@ coverage/
 vm-ruby/
 .DS_Store
 npm-debug.log
+tmp/
