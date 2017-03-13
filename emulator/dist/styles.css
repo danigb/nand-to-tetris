@@ -1,0 +1,18 @@
+html {
+  font-family: monospace;
+}
+
+div#app {
+  width: 60em;
+  margin: 2em auto;
+}
+
+textarea {
+  float: right;
+  font-family: monospace;
+  width: 50%;
+  margin-right: 5%;
+  height: 80em;
+}
+
+.ROM .current { border-top: 1px solid #c00; font-weight: bold; width: 40%; }

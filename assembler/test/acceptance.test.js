@@ -1,10 +1,10 @@
-/* global test expect */
+/* global describe test expect */
 const { readFileSync } = require('fs')
 const { join } = require('path')
-const Assembler = require('..')
+const { Assembler } = require('../src/assembler')
 
-var SHORT = ['Add', 'Max', 'MaxL', 'Pong', 'PongL']
-var LONG = ['Pong', 'PongL']
+var SHORT = ['Add', 'Max', 'MaxL']
+var LONG = ['Pong', 'PongL', 'Rect', 'RectL']
 
 const loadData = (fileName) => {
   var input = readFileSync(join(__dirname, 'acceptance', fileName + '.asm')).toString()
@@ -13,18 +13,20 @@ const loadData = (fileName) => {
   return { input, output }
 }
 
-test('Acceptance tests', () => {
-  var asm = new Assembler()
-  SHORT.forEach(fileName => {
-    var { input, output } = loadData(fileName)
-    var { instructions } = asm.assemble(input)
-    expect(instructions).toEqual(output)
+describe('Acceptance tests', () => {
+  test('Short programs', () => {
+    SHORT.forEach(fileName => {
+      var { input, output } = loadData(fileName)
+      expect(new Assembler(input).program()).toEqual(output)
+    })
   })
-  LONG.forEach(fileName => {
-    var { input, output } = loadData(fileName)
-    var { instructions } = asm.assemble(input)
-    instructions.forEach((line, num) => {
-      expect(line).toBe(output[num])
+  test('Long programs', () => {
+    LONG.forEach(fileName => {
+      var { input, output } = loadData(fileName)
+      var asm = new Assembler(input)
+      asm.program().forEach((line, num) => {
+        expect(line).toBe(output[num])
+      })
     })
   })
 })

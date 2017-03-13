@@ -3,3 +3,6 @@ node_modules/
 nand2tetris/
 coverage/
 */docs/
+vm-ruby/
+.DS_Store
+npm-debug.log

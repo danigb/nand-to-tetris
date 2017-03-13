@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>symbol-table.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="assembler.html">
+                  assembler.js
+                </a>
+              
+                
+                <a class="source" href="code.html">
+                  code.js
+                </a>
+              
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
+              
+                
+                <a class="source" href="symbol-table.html">
+                  symbol-table.js
+                </a>
+              
+                
+                <a class="source" href="emulator.html">
+                  emulator.js
+                </a>
+              
+                
+                <a class="source" href="cpu.html">
+                  cpu.js
+                </a>
+              
+                
+                <a class="source" href="index.html">
+                  index.js
+                </a>
+              
+                
+                <a class="source" href="memory.html">
+                  memory.js
+                </a>
+              
+                
+                <a class="source" href="code-writer.html">
+                  code-writer.js
+                </a>
+              
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
+              
+                
+                <a class="source" href="translator.html">
+                  translator.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>symbol-table.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SymbolTable</span> </span>{
+  <span class="hljs-keyword">constructor</span> () {
+    <span class="hljs-keyword">this</span>.table = <span class="hljs-built_in">Object</span>.assign({}, PREDEFINED)
+  }
+  addEntry (symbol, address) {
+    <span class="hljs-keyword">this</span>.table[symbol] = address
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>
+  }
+  contains (symbol) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getAddress(symbol) !== <span class="hljs-literal">undefined</span>
+  }
+  getAddress (symbol) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.table[symbol]
+  }
+}
+
+<span class="hljs-keyword">var</span> PREDEFINED = {
+  <span class="hljs-string">'SP'</span>: <span class="hljs-number">0</span>,
+  <span class="hljs-string">'LCL'</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-string">'ARG'</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-string">'THIS'</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-string">'THAT'</span>: <span class="hljs-number">4</span>,
+
+  <span class="hljs-string">'R0'</span>: <span class="hljs-number">0</span>,
+  <span class="hljs-string">'R1'</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-string">'R2'</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-string">'R3'</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-string">'R4'</span>: <span class="hljs-number">4</span>,
+  <span class="hljs-string">'R5'</span>: <span class="hljs-number">5</span>,
+  <span class="hljs-string">'R6'</span>: <span class="hljs-number">6</span>,
+  <span class="hljs-string">'R7'</span>: <span class="hljs-number">7</span>,
+  <span class="hljs-string">'R8'</span>: <span class="hljs-number">8</span>,
+  <span class="hljs-string">'R9'</span>: <span class="hljs-number">9</span>,
+  <span class="hljs-string">'R10'</span>: <span class="hljs-number">10</span>,
+  <span class="hljs-string">'R11'</span>: <span class="hljs-number">11</span>,
+  <span class="hljs-string">'R12'</span>: <span class="hljs-number">12</span>,
+  <span class="hljs-string">'R13'</span>: <span class="hljs-number">13</span>,
+  <span class="hljs-string">'R14'</span>: <span class="hljs-number">14</span>,
+  <span class="hljs-string">'R15'</span>: <span class="hljs-number">15</span>,
+
+  <span class="hljs-string">'SCREEN'</span>: <span class="hljs-number">0x4000</span>,
+  <span class="hljs-string">'KBD'</span>: <span class="hljs-number">0x6000</span>
+}
+
+<span class="hljs-built_in">module</span>.exports = SymbolTable</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

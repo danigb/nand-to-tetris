@@ -1,7 +1,51 @@
+// Pad a string with zeros
+const PADDING = '0000000000000000'
+const pad = (str) => PADDING.slice(0, -str.length) + str
+
+class Code {
+  static toBinary (num) {
+    return pad(parseInt(num, 10).toString(2))
+  }
+
+  // Encode an A instruction into a binary number
+  static encodeA (address) {
+    return Code.toBinary(address)
+  }
+  // Encode a C instruction into a binary number
+  static encodeC (comp, dest = '', jump = '') {
+    return '111' +
+      valid(comp, encodeComp, 'Invalid C comp: ') +
+      valid(dest, encodeDest, 'Invalid C dest: ') +
+      valid(jump, encodeJump, 'Invalid C jump: ')
+  }
+
+  static decodeC (binary) {
+    return {
+      comp: valid(binary.slice(3, 10), decodeComp, 'Invalid C comp: '),
+      dest: valid(binary.slice(10, 13), decodeDest, 'Invalid C dest: '),
+      jump: valid(binary.slice(13, 16), decodeJump, 'Invalid C jump: ')
+    }
+  }
+}
+
+function valid (src, decode, err) {
+  const value = decode(src)
+  if (value === undefined) throw Error(err + src)
+  return value
+}
+
+function encodeDest (dest) { return DEST[dest] }
+function encodeComp (comp) { return COMP[comp] }
+function encodeJump (jump) { return JUMP[jump] }
+
+function decodeDest (dest) { return REV_DEST[dest] }
+function decodeComp (comp) { return REV_COMP[comp] }
+function decodeJump (jump) { return REV_JUMP[jump] }
+
 /**
  * Translates Hack assembly language mnemonics into binary codes.
  */
-var DEST = {
+const DEST = {
   '': '000',
   'M': '001',
   'D': '010',
@@ -11,6 +55,8 @@ var DEST = {
   'AD': '110',
   'AMD': '111'
 }
+const REV_DEST = reverse(DEST)
+
 const COMP = {
   '0': '0101010',
   '1': '0111111',
@@ -47,6 +93,7 @@ const COMP = {
   'M&D': '1000000',
   'M|D': '1010101'
 }
+const REV_COMP = reverse(COMP)
 
 const JUMP = {
   '': '000',
@@ -58,10 +105,14 @@ const JUMP = {
   'JLE': '110',
   'JMP': '111'
 }
+const REV_JUMP = reverse(JUMP)
 
-const Code = {
-  dest: (value) => DEST[value],
-  comp: (value) => COMP[value],
-  jump: (value) => JUMP[value]
+// It reverses a hash map (convert values tu keys and keys to values)
+function reverse (map) {
+  return Object.keys(map).reduce((rev, key) => {
+    rev[map[key]] = key
+    return rev
+  }, {})
 }
-module.exports = Code
+
+module.exports = { Code }

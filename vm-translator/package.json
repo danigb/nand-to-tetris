@@ -1,0 +1,11 @@
+{
+  "name": "vm-translator",
+  "private": true,
+  "version": "1.0.0",
+  "description": "This module provides the VM translator. It's equivalent to the chapters 7 and 8 of the book.",
+  "main": "src/translator.js",
+  "scripts": {
+    "test": "jest test/*",
+    "docs": "docco src/* && mv docs/"
+  }
+}

@@ -5,7 +5,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest test/*"
+    "test": "jest test/*",
+    "build": "browserify -t babelify -g uglifyify -p bundle-collapser/plugin index.js | uglifyjs > dist/bundle.js",
+    "watch": "watchify -t babelify index.js -o dist/bundle.js",
+    "start": "open dist/index.html && npm run watch"
   },
   "dependencies": {
     "assembler": "file:///Users/Dani/Code/Js16/nand-to-tetris/assembler"

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>memory.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="assembler.html">
+                  assembler.js
+                </a>
+              
+                
+                <a class="source" href="code.html">
+                  code.js
+                </a>
+              
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
+              
+                
+                <a class="source" href="symbol-table.html">
+                  symbol-table.js
+                </a>
+              
+                
+                <a class="source" href="emulator.html">
+                  emulator.js
+                </a>
+              
+                
+                <a class="source" href="cpu.html">
+                  cpu.js
+                </a>
+              
+                
+                <a class="source" href="index.html">
+                  index.js
+                </a>
+              
+                
+                <a class="source" href="memory.html">
+                  memory.js
+                </a>
+              
+                
+                <a class="source" href="code-writer.html">
+                  code-writer.js
+                </a>
+              
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
+              
+                
+                <a class="source" href="translator.html">
+                  translator.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>memory.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h2 id="memory">Memory</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>“Memory: Composed from three chips: RAM16K, Screen, and Keyboard. The Screen and the Keyboard are available as built-in chips and there is no need to build them. Although the RAM16K chip was built in the project in chapter 3, we recommend using its built-in version, as it provides a debugging-friendly GUI.”</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>“The Hack programmer is aware of two distinct address spaces: an instruction memory and a data memory. Both memories are 16-bit wide and have a 15-bit address space, meaning that the maximum addressable size of each memory is 32K 16-bit words.”</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RAM</span> </span>{
+  <span class="hljs-keyword">constructor</span> (init) {
+    <span class="hljs-keyword">this</span>.heap = {}
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; init; i++) <span class="hljs-keyword">this</span>.heap[i] = <span class="hljs-number">0</span>
+  }
+  read (address) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.heap[address] || <span class="hljs-number">0</span>
+  }
+  write (address, value) {
+    <span class="hljs-keyword">this</span>.heap[address] = value
+  }
+  dump () {
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>.heap).map(<span class="hljs-function"><span class="hljs-params">k</span> =&gt;</span> [k, <span class="hljs-keyword">this</span>.heap[k]])
+  }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ROM</span> </span>{
+  <span class="hljs-keyword">constructor</span> (program) {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'PROGRAM'</span>, program)
+    <span class="hljs-keyword">this</span>.instructions = program.map(<span class="hljs-function"><span class="hljs-params">bits</span> =&gt;</span> <span class="hljs-built_in">parseInt</span>(bits, <span class="hljs-number">2</span>))
+  }
+
+  read (address) {
+    <span class="hljs-keyword">var</span> inst = <span class="hljs-keyword">this</span>.instructions[address]
+    <span class="hljs-keyword">if</span> (inst === <span class="hljs-literal">undefined</span>) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Out of bounds ROM access: '</span> + address)
+    }
+    <span class="hljs-keyword">return</span> inst
+  }
+}
+
+<span class="hljs-keyword">const</span> RAM_MASK = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">14</span>
+<span class="hljs-keyword">const</span> SCREEN_MASK = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">13</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Memory</span> </span>{
+  <span class="hljs-keyword">constructor</span> (ram, screen, keyboard) {
+    <span class="hljs-keyword">this</span>.ram = ram
+    <span class="hljs-keyword">this</span>.screen = screen
+    <span class="hljs-keyword">this</span>.keyboard = keyboard
+  }
+
+  read (address) {
+    <span class="hljs-keyword">if</span> (~address &amp; RAM_MASK) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.ram.read(address)
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (~address &amp; SCREEN_MASK) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Equivalent to addr - RAM_SIZE</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.screen.read(address &amp; (RAM_MASK - <span class="hljs-number">1</span>))
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.keyboard.read(address &amp; (SCREEN_MASK - <span class="hljs-number">1</span>))
+    }
+  }
+
+  write (address, value) {
+    <span class="hljs-keyword">if</span> (~address &amp; RAM_MASK) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.ram.write(address, value)
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (~address &amp; SCREEN_MASK) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.screen.write(address &amp; (RAM_MASK - <span class="hljs-number">1</span>), value)
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.keyboard.write(address &amp; (SCREEN_MASK - <span class="hljs-number">1</span>), value)
+    }
+  }
+}
+
+<span class="hljs-built_in">module</span>.exports = { ROM, RAM, Memory }</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

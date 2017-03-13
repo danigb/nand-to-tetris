@@ -5,6 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "jest */test/*",
+    "docs": "docco */src/*",
     "build": "browserify -t babelify -g uglifyify -p bundle-collapser/plugin emulator/index.js | uglifyjs > docs/demo/bundle.js",
     "watch": "watchify -t babelify emulator/index.js -o docs/demo/bundle.js",
     "rollup:build": "rollup -cf iife -i emulator/index.js -o docs/demo/bundle.js",
