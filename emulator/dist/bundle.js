@@ -121,6 +121,11 @@ var Code = function () {
       return '111' + valid(comp, encodeComp, 'Invalid C comp: ') + valid(dest, encodeDest, 'Invalid C dest: ') + valid(jump, encodeJump, 'Invalid C jump: ');
     }
   }, {
+    key: 'decodeA',
+    value: function decodeA(binary) {
+      return parseInt(binary, 2);
+    }
+  }, {
     key: 'decodeC',
     value: function decodeC(binary) {
       return {
@@ -213,6 +218,7 @@ var COMP = {
 };
 var REV_COMP = reverse(COMP);
 
+// “The **jump** field of the C-instruction tells the computer what to do next. There are two possibilities: The computer should either fetch and execute the next instruction in the program, which is the default, or it should fetch and execute an instruction located elsewhere in the program. In the latter case, we assume that **the A register has been previously set to the address to which we have to jump**.”
 var JUMP = {
   '': '000',
   'JGT': '001',
@@ -607,6 +613,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 // “There are two types of instructions, A and C. The 16nth bit value determines which one is”
 var I_MASK = 1 << 15;
+var noop = function noop() {};
 
 // “The Hack programmer is aware of two 16-bit registers called D and A. These registers can be manipulated explicitly by arithmetic and logical instructions like A=D-1 or D=!A (where “!” means a 16-bit Not operation). While D is used solely to store data values, A doubles as both a data register and an address register.”
 
@@ -634,11 +641,11 @@ var Hack = function () {
       return this;
     }
   }, {
-    key: 'start',
-    value: function start() {
+    key: 'run',
+    value: function run() {
       while (this.rom[this.PC] !== undefined) {
         this.tick();
-      }
+      }return this;
     }
   }, {
     key: 'read',

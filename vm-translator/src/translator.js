@@ -11,17 +11,19 @@ class Translator {
   translate () {
     if (this.output) return this.output
     const writer = new CodeWriter()
+
+    // traverse all files
     Object.keys(this.files).forEach((filename) => {
       writer.setFileName(filename)
       const parser = new Parser(this.files[filename])
       while (parser.next()) {
         switch (parser.commandType()) {
           case 'arithmetic':
-            writer.writeArithmetic(parser.arg1)
+            writer.writeArithmetic(parser.arg1())
             break
           case 'pop':
           case 'push':
-            writer.writePushPop(parser.type, parser.arg1, parser.arg2)
+            writer.writePushPop(parser.commandType(), parser.arg1(), parser.arg2())
             break
         }
       }

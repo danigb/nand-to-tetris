@@ -1,5 +1,5 @@
 // # CodeWriter
-const { push } = require('./operations')
+const OP = require('./operations')
 
 // “Translates VM commands into Hack assembly code.”
 
@@ -14,12 +14,14 @@ class CodeWriter {
   }
 
   writeArithmetic (command) {
-    if (command === 'add') this.output.s
+    const operation = OP[command]
+    console.log(command, operation)
+    this.output.push(operation())
   }
 
   writePushPop (command, segment, index) {
     if (command === 'push') {
-      if (segment === 'constant') push(index)
+      if (segment === 'constant') this.output.push(OP.push(index))
     } else if (command === 'pop') {
 
     } else {

@@ -1,5 +1,6 @@
-html {
-  font-family: monospace;
+body {
+    margin: 0;
+    font-family: Menlo, Monaco, monospace;
 }
 
 div#app {

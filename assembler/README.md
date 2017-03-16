@@ -10,4 +10,7 @@
 
 “The C-instruction answers three questions: (a) what to compute, (b) where to store the computed value, and (c) what to do next? ”
 
+“The **jump** field of the C-instruction tells the computer what to do next. There are two possibilities: The computer should either fetch and execute the next instruction in the program, which is the default, or it should fetch and execute an instruction located elsewhere in the program. In the latter case, we assume that **the A register has been previously set to the address to which we have to jump**.”
+
+
 “The Hack ALU is designed to compute a fixed set of functions on the D, A, and M registers (where M stands for Memory[A])”

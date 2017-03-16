@@ -1,6 +1,7 @@
 
 // “There are two types of instructions, A and C. The 16nth bit value determines which one is”
 const I_MASK = 1 << 15
+const noop = () => { }
 
 // “The Hack programmer is aware of two 16-bit registers called D and A. These registers can be manipulated explicitly by arithmetic and logical instructions like A=D-1 or D=!A (where “!” means a 16-bit Not operation). While D is used solely to store data values, A doubles as both a data register and an address register.”
 class Hack {
@@ -21,8 +22,9 @@ class Hack {
     return this
   }
 
-  start () {
+  run () {
     while (this.rom[this.PC] !== undefined) this.tick()
+    return this
   }
 
   read (address) {

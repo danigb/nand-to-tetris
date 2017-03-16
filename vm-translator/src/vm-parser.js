@@ -4,14 +4,14 @@
 
 const COMMANDS = {
 // Arithmetic commands: perform arithmetic and logical operations on the stack.
-  'add:': 'arithmetic',
-  'sub:': 'arithmetic',
-  'neg:': 'arithmetic',
-  'eq:': 'arithmetic',
-  'gt:': 'arithmetic',
-  'lt:': 'arithmetic',
-  'and:': 'arithmetic',
-  'or:': 'arithmetic',
+  'add': 'arithmetic',
+  'sub': 'arithmetic',
+  'neg': 'arithmetic',
+  'eq': 'arithmetic',
+  'gt': 'arithmetic',
+  'lt': 'arithmetic',
+  'and': 'arithmetic',
+  'or': 'arithmetic',
   'not': 'arithmetic',
 // Memory access commands: transfer data between the stack and virtual memory segments.
   'pop': 'pop',
@@ -27,15 +27,27 @@ const COMMANDS = {
 
 class Parser {
   constructor (input) {
-    this.lines = input.split('\n').map(line => line.trim()).filter(line => line)
+    this.lines = input.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('//'))
   }
 
   next () {
+    if (this.lines.length === 0) return false
     this.current = this.lines.shift().split(/\s+/)
     this.type = COMMANDS[this.current[0]]
     if (!this.type) throw Error('Unknown command: "' + this.current.join(' ') + '"')
-    this.arg1 = this.current[1]
-    this.arg2 = this.current[2]
+    return true
+  }
+
+  commandType () {
+    return this.type
+  }
+
+  arg1 () {
+    return this.current[this.type === 'arithmetic' ? 0 : 1]
+  }
+
+  arg2 () {
+    return this.current[2]
   }
 }
 

@@ -19,6 +19,10 @@ class Code {
       valid(jump, encodeJump, 'Invalid C jump: ')
   }
 
+  static decodeA (binary) {
+    return parseInt(binary, 2)
+  }
+
   static decodeC (binary) {
     return {
       comp: valid(binary.slice(3, 10), decodeComp, 'Invalid C comp: '),
@@ -95,6 +99,7 @@ const COMP = {
 }
 const REV_COMP = reverse(COMP)
 
+// “The **jump** field of the C-instruction tells the computer what to do next. There are two possibilities: The computer should either fetch and execute the next instruction in the program, which is the default, or it should fetch and execute an instruction located elsewhere in the program. In the latter case, we assume that **the A register has been previously set to the address to which we have to jump**.”
 const JUMP = {
   '': '000',
   'JGT': '001',

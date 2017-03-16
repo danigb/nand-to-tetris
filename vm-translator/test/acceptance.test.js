@@ -2,23 +2,52 @@
 var { Assembler } = require('../../assembler')
 var { Hack } = require('../../hack')
 var { Translator } = require('..')
+const { readFileSync } = require('fs')
+const { join } = require('path')
 
-function setup (source, ram) {
-  const assembly = new Translator({ test: source }).translate()
-  console.log(assembly)
-  const program = new Assembler(assembly).program()
-  return new Hack({ rom: program, ram })
+function readSource (name) {
+  const path = join(__dirname, 'acceptance/', name, name + '.vm')
+  return readFileSync(path).toString()
 }
 
-describe('VM-Translator - Acceptance tests - Stack Arithmetic', () => {
-  test('SimpleAdd', () => {
-    var program = `
-      push constant 7
-      push constant 8
-      add
-    `
-    var hack = setup(program, { 0: 256 })
-    hack.start()
-    expect(hack.ram).toEqual({ 0: 257, 256: 17 })
+function run (source, ram) {
+  const assembly = new Translator({ test: source }).translate()
+  const program = new Assembler(assembly).program()
+  const hack = new Hack({ rom: program, ram })
+  return hack.run()
+}
+
+function checkRam (hack, ram) {
+  Object.keys(ram).forEach((address) => {
+    expect(hack.ram[address]).toBe(ram[address])
+  })
+}
+
+const ADDRESS = /^\s+RAM\[(\d+)]/
+function readOutput (name) {
+  const path = join(__dirname, 'acceptance/', name, name + '.cmp')
+  const [addresses, values] = readFileSync(path).toString().split('\n')
+    .map(line => line.split('|').filter(l => l))
+
+  return addresses.reduce((ram, address, i) => {
+    address = ADDRESS.exec(address)[1]
+    ram[address] = +values[i]
+    return ram
+  }, {})
+}
+
+const TESTS = [
+  // “Stage I: Stack Arithmetic”
+  'SimpleAdd', 'StackTest'
+]
+
+describe('VM-Translator - Acceptance tests', () => {
+  TESTS.forEach((name) => {
+    test(name, () => {
+      var program = readSource(name)
+      var expectedRam = readOutput(name)
+      var hack = run(program, { 0: 256 })
+      checkRam(hack, expectedRam)
+    })
   })
 })
