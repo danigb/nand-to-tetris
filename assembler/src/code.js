@@ -59,7 +59,7 @@ const DEST = {
   'AD': '110',
   'AMD': '111'
 }
-const REV_DEST = reverse(DEST)
+const REV_DEST = revMap(DEST)
 
 const COMP = {
   '0': '0101010',
@@ -97,7 +97,7 @@ const COMP = {
   'M&D': '1000000',
   'M|D': '1010101'
 }
-const REV_COMP = reverse(COMP)
+const REV_COMP = revMap(COMP)
 
 // “The **jump** field of the C-instruction tells the computer what to do next. There are two possibilities: The computer should either fetch and execute the next instruction in the program, which is the default, or it should fetch and execute an instruction located elsewhere in the program. In the latter case, we assume that **the A register has been previously set to the address to which we have to jump**.”
 const JUMP = {
@@ -110,14 +110,14 @@ const JUMP = {
   'JLE': '110',
   'JMP': '111'
 }
-const REV_JUMP = reverse(JUMP)
+const REV_JUMP = revMap(JUMP)
 
 // It reverses a hash map (convert values tu keys and keys to values)
-function reverse (map) {
+function revMap (map) {
   return Object.keys(map).reduce((rev, key) => {
     rev[map[key]] = key
     return rev
   }, {})
 }
 
-module.exports = { Code }
+module.exports = { Code, revMap }

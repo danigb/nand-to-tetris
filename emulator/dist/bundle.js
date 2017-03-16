@@ -79,7 +79,7 @@ var Assembler = function () {
 
 module.exports = { Assembler: Assembler };
 
-},{"./code":2,"./parser":3,"./symbols":4}],2:[function(require,module,exports){
+},{"./code":2,"./parser":4,"./symbols":5}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -178,7 +178,7 @@ var DEST = {
   'AD': '110',
   'AMD': '111'
 };
-var REV_DEST = reverse(DEST);
+var REV_DEST = revMap(DEST);
 
 var COMP = {
   '0': '0101010',
@@ -216,7 +216,7 @@ var COMP = {
   'M&D': '1000000',
   'M|D': '1010101'
 };
-var REV_COMP = reverse(COMP);
+var REV_COMP = revMap(COMP);
 
 // “The **jump** field of the C-instruction tells the computer what to do next. There are two possibilities: The computer should either fetch and execute the next instruction in the program, which is the default, or it should fetch and execute an instruction located elsewhere in the program. In the latter case, we assume that **the A register has been previously set to the address to which we have to jump**.”
 var JUMP = {
@@ -229,19 +229,71 @@ var JUMP = {
   'JLE': '110',
   'JMP': '111'
 };
-var REV_JUMP = reverse(JUMP);
+var REV_JUMP = revMap(JUMP);
 
 // It reverses a hash map (convert values tu keys and keys to values)
-function reverse(map) {
+function revMap(map) {
   return Object.keys(map).reduce(function (rev, key) {
     rev[map[key]] = key;
     return rev;
   }, {});
 }
 
-module.exports = { Code: Code };
+module.exports = { Code: Code, revMap: revMap };
 
 },{}],3:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _require = require('./code'),
+    Code = _require.Code,
+    revMap = _require.revMap;
+
+var Disassembler = function () {
+  function Disassembler() {
+    _classCallCheck(this, Disassembler);
+  }
+
+  _createClass(Disassembler, null, [{
+    key: 'disassembly',
+    value: function disassembly(rom, symbols) {
+      var table = symbols ? revMap(symbols) : {};
+      return rom.map(function (i) {
+        return typeof i === 'string' ? i : Code.toBinary(i);
+      }).map(function (instr) {
+        return instr[0] === '0'
+        // it's an A instruction code
+        ? toA(Code.decodeA(instr), table)
+        // it is a C instruction code
+        : toC(Code.decodeC(instr));
+      });
+    }
+  }]);
+
+  return Disassembler;
+}();
+
+function toA(address, symbols) {
+  address = symbols[address] || address;
+  return '@' + address;
+}
+
+function toC(_ref) {
+  var comp = _ref.comp,
+      dest = _ref.dest,
+      jump = _ref.jump;
+
+  if (dest.length) dest = dest + '=';
+  if (jump.length) jump = ';' + jump;
+  return dest + comp + jump;
+}
+
+module.exports = { Disassembler: Disassembler };
+
+},{"./code":2}],4:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -312,7 +364,7 @@ var Parser = function () {
 
 module.exports = { Parser: Parser };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -386,7 +438,7 @@ var PREDEFINED = {
 
 module.exports = { Symbols: Symbols };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -398,6 +450,9 @@ var _hack = require('../hack');
 var _require = require('../assembler'),
     Assembler = _require.Assembler;
 
+var _require2 = require('../assembler/src/disassembler'),
+    Disassembler = _require2.Disassembler;
+
 var classNames = require('classnames');
 
 var PAD = '0000000000000000';
@@ -407,8 +462,6 @@ var pad = function pad(num) {
 var toBinary = function toBinary(i) {
   return pad(i.toString(2));
 };
-
-var EXAMPLE = '\n// This file is part of www.nand2tetris.org\n// and the book \'The Elements of Computing Systems\'\n// by Nisan and Schocken, MIT Press.\n// File name: projects/06/add/Add.asm\n\n// Computes R0 = 2 + 3  (R0 refers to RAM[0])\n\n@2\nD=A\n@3\nD=D+A\n@0\nM=D\n';
 
 var log = function log(name, value, extra) {
   console.log(name, value, extra || '');return value;
@@ -535,7 +588,7 @@ var RAM = function RAM(_ref7) {
 var ROM = function ROM(_ref9) {
   var hack = _ref9.hack,
       program = _ref9.program,
-      symbols = _ref9.symbols;
+      disassembled = _ref9.disassembled;
   return (0, _hyperapp.h)(
     'div',
     { 'class': 'ROM' },
@@ -550,10 +603,15 @@ var ROM = function ROM(_ref9) {
         { 'class': classNames({ current: hack.PC === pos, inst: true }) },
         pos,
         ':\xA0',
-        instr
+        instr,
+        ' ',
+        disassembled[pos]
       );
     })
   );
+};
+var disassemble = function disassemble(rom) {
+  return Disassembler.disassembly(rom);
 };
 var Computer = function Computer(_ref10) {
   var program = _ref10.program,
@@ -563,7 +621,7 @@ var Computer = function Computer(_ref10) {
     'div',
     null,
     (0, _hyperapp.h)(CPU, { hack: hack, tick: actions.tick, update: actions.updateCPU }),
-    (0, _hyperapp.h)(ROM, { hack: hack, program: program }),
+    (0, _hyperapp.h)(ROM, { hack: hack, program: program, disassembled: disassemble(hack.rom) }),
     (0, _hyperapp.h)(RAM, { hack: hack, update: actions.updateRAM })
   );
 };
@@ -601,10 +659,15 @@ var view = function view(model, actions) {
 };
 
 (0, _hyperapp.app)({
-  model: init(EXAMPLE), view: view, actions: actions
+  model: init(example()), view: view, actions: actions
 });
 
-},{"../assembler":1,"../hack":6,"classnames":7,"hyperapp":8}],6:[function(require,module,exports){
+function example() {
+  var EXAMPLE = '// This file is part of www.nand2tetris.org\n// and the book \'The Elements of Computing Systems\'\n// by Nisan and Schocken, MIT Press.\n// File name: projects/06/add/Add.asm\n\n// Computes R0 = 2 + 3  (R0 refers to RAM[0])\n\n@2\nD=A\n@3\nD=D+A\n@0\nM=D\n';
+  return EXAMPLE;
+}
+
+},{"../assembler":1,"../assembler/src/disassembler":3,"../hack":7,"classnames":8,"hyperapp":9}],7:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -613,7 +676,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 // “There are two types of instructions, A and C. The 16nth bit value determines which one is”
 var I_MASK = 1 << 15;
-var noop = function noop() {};
 
 // “The Hack programmer is aware of two 16-bit registers called D and A. These registers can be manipulated explicitly by arithmetic and logical instructions like A=D-1 or D=!A (where “!” means a 16-bit Not operation). While D is used solely to store data values, A doubles as both a data register and an address register.”
 
@@ -671,6 +733,11 @@ var Hack = function () {
     key: 'registers',
     value: function registers() {
       return { PC: this.PC, A: this.A, D: this.D };
+    }
+  }, {
+    key: 'lastStackItem',
+    value: function lastStackItem() {
+      return this.ram[this.ram[0] - 1];
     }
   }]);
 
@@ -790,7 +857,7 @@ var ALU = function () {
 
 module.exports = { Hack: Hack, ALU: ALU };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*!
   Copyright (c) 2016 Jed Watson.
   Licensed under the MIT License (MIT), see
@@ -840,8 +907,8 @@ module.exports = { Hack: Hack, ALU: ALU };
 	}
 }());
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t(e.hyperapp=e.hyperapp||{})}(this,function(e){"use strict";function t(e,n,o){n.ns="http://www.w3.org/2000/svg";for(var r=0;r<o.length;r++){var a=o[r];a.data&&t(a.tag,a.data,a.children)}}function n(e,t){var n,o={};for(var r in e){var a=[];if("*"!==r&&(t.replace(new RegExp("^"+r.replace(/\//g,"\\/").replace(/:([A-Za-z0-9_]+)/g,function(e,t){return a.push(t),"([A-Za-z0-9_]+)"})+"/?$","g"),function(){for(var e=1;e<arguments.length-2;e++)o[a.shift()]=arguments[e];n=r}),n))break}return{match:n||"*",params:o}}var o,r,a,i=[],c=function(e,n){var c,f;for(a=[],o=arguments.length;o-- >2;)i.push(arguments[o]);for(;i.length;)if(Array.isArray(r=i.pop()))for(o=r.length;o--;)i.push(r[o]);else null!=r&&r!==!0&&r!==!1&&("number"==typeof r&&(r+=""),c="string"==typeof r,c&&f?a[a.length-1]+=r:(a.push(r),f=c));return"function"==typeof e?e(n,a):("svg"===e&&t(e,n,a),{tag:e,data:n||{},children:a})},f=function(e){function t(e){for(var t=0;t<w.onError.length;t++)w.onError[t](e);if(t<=0)throw e}function n(e,o,i){Object.keys(o).forEach(function(c){e[c]||(e[c]={});var f,u=i?i+"."+c:c,d=o[c];"function"==typeof d?e[c]=function(e){for(f=0;f<w.onAction.length;f++)w.onAction[f](u,e);var n=d(h,e,y,t);if(void 0===n||"function"==typeof n.then)return n;for(f=0;f<w.onUpdate.length;f++)w.onUpdate[f](h,n,e);h=a(h,n),r(h,m)}:n(e[c],d,u)})}function o(e){"l"!==document.readyState[0]?e():document.addEventListener("DOMContentLoaded",e)}function r(e,t){for(n=0;n<w.onRender.length;n++)t=w.onRender[n](e,t);p(g,v,v=t(e,y),0);for(var n=0;n<A.length;n++)A[n]();A=[]}function a(e,t){var n,o={};if(i(t)||Array.isArray(t))return t;for(n in e)o[n]=e[n];for(n in t)o[n]=t[n];return o}function i(e){return e=typeof e,"string"===e||"number"===e||"boolean"===e}function c(e,t){setTimeout(function(){e(t)},0)}function f(e,t){return e.tag!==t.tag||typeof e!=typeof t||i(e)&&e!==t}function u(e){var t;if("string"==typeof e)t=document.createTextNode(e);else{t=e.data&&e.data.ns?document.createElementNS(e.data.ns,e.tag):document.createElement(e.tag);for(var n in e.data)"onCreate"===n?c(e.data[n],t):s(t,n,e.data[n]);for(var o=0;o<e.children.length;o++)t.appendChild(u(e.children[o]))}return t}function d(e,t,n){e.removeAttribute("className"===t?"class":t),"boolean"!=typeof n&&"true"!==n&&"false"!==n||(e[t]=!1)}function s(e,t,n,o){if("style"===t)for(var r in n)e.style[r]=n[r];else if("o"===t[0]&&"n"===t[1]){var a=t.substr(2).toLowerCase();e.removeEventListener(a,o),e.addEventListener(a,n)}else"false"===n||n===!1?(e.removeAttribute(t),e[t]=!1):(e.setAttribute(t,n),"http://www.w3.org/2000/svg"!==e.namespaceURI&&(e[t]=n))}function l(e,t,n){for(var o in a(n,t)){var r=t[o],i=n[o],f=e[o];void 0===r?d(e,o,i):"onUpdate"===o?c(r,e):(r!==i||"boolean"==typeof f&&f!==r)&&s(e,o,r,i)}}function p(e,t,n,o){if(void 0===t)e.appendChild(u(n));else if(void 0===n){var r=e.childNodes[o];A.push(e.removeChild.bind(e,r)),t&&t.data&&t.data.onRemove&&c(t.data.onRemove,r)}else if(f(n,t))e.replaceChild(u(n),e.childNodes[o]);else if(n.tag){var r=e.childNodes[o];l(r,n.data,t.data);for(var a=n.children.length,i=t.children.length,d=0;d<a||d<i;d++){var s=n.children[d];p(r,t.children[d],s,d)}}}for(var h,v,g,m=e.view||function(){return""},y={},b=[],w={onError:[],onAction:[],onUpdate:[],onRender:[]},E=[e].concat((e.plugins||[]).map(function(t){return t(e)})),A=[],R=0;R<E.length;R++){var C=E[R];void 0!==C.model&&(h=a(h,C.model)),C.actions&&n(y,C.actions),C.subscriptions&&(b=b.concat(C.subscriptions));var L=C.hooks;L&&Object.keys(L).forEach(function(e){w[e].push(L[e])})}o(function(){g=e.root||document.body.appendChild(document.createElement("div")),r(h,m);for(var n=0;n<b.length;n++)b[n](h,y,t)})},u=function(e){return{model:{router:n(e.view,location.pathname)},actions:{router:{match:function(t,o){return{router:n(e.view,o)}},go:function(e,t,n){history.pushState({},"",t),n.router.match(t)}}},hooks:{onRender:function(t){return e.view[t.router.match]}},subscriptions:[function(e,t){addEventListener("popstate",function(){t.router.match(location.pathname)})}]}};e.h=c,e.app=f,e.Router=u});
 
 
-},{}]},{},[5]);
+},{}]},{},[6]);

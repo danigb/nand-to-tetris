@@ -44,10 +44,15 @@ const TESTS = [
 describe('VM-Translator - Acceptance tests', () => {
   TESTS.forEach((name) => {
     test(name, () => {
-      var program = readSource(name)
-      var expectedRam = readOutput(name)
-      var hack = run(program, { 0: 256 })
-      checkRam(hack, expectedRam)
+      try {
+        var program = readSource(name)
+        var expectedRam = readOutput(name)
+        var hack = run(program, { 0: 256 })
+        checkRam(hack, expectedRam)
+      } catch (e) {
+        console.log(name + ' ============\n', program)
+        throw e
+      }
     })
   })
 })

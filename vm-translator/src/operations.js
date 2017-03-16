@@ -62,8 +62,9 @@ const jumpTo = (LABEL) => asm(
 // “The VM represents true and false as -1 (minus one, 0xFFFF) and 0 (zero, 0x0000), respectively.”
 const compare = (op, TRUE, END) => asm(
   sub(), // substract the last two numbers
+  'D=M', // save the result into D
   `@${TRUE}`, // load the TRUE address
-  `M;${op}`, // perform the conditional jump operation
+  `D;${op}`, // perform the conditional jump operation
   replaceLast('0'), // write false (0) at the last element of the stack
   jumpTo(END),
   label(TRUE), // start the TRUE section
@@ -72,11 +73,11 @@ const compare = (op, TRUE, END) => asm(
 )
 
 // Equality
-const eq = (TRUE, FALSE) => compare('JEQ', TRUE, FALSE)
+const eq = (TRUE, END) => compare('JEQ', TRUE, END)
 // Greater than
-const gt = () => compare()
+const gt = (TRUE, END) => compare('JGT', TRUE, END)
 // Lest than
-const lt = () => compare()
+const lt = (TRUE, END) => compare('JLT', TRUE, END)
 
 /* eslint-disable object-property-newline */
 module.exports = {

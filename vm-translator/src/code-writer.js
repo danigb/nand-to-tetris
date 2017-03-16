@@ -1,10 +1,12 @@
 // # CodeWriter
 const OP = require('./operations')
 
-// “Translates VM commands into Hack assembly code.”
+const isComparator = (cmd) => cmd === 'eq' || cmd === 'gt' || cmd === 'lt'
 
+// “Translates VM commands into Hack assembly code.”
 class CodeWriter {
   constructor (output = []) {
+    this.nextLabelId = 0
     this.output = output
     this.fileName = null
   }
@@ -13,10 +15,17 @@ class CodeWriter {
     this.fileName = fileName
   }
 
+  nextLabel (label) {
+    if (!label) label = ''
+    return `${this.fileName}.${label}.${this.nextLabelId++}`
+  }
+
   writeArithmetic (command) {
     const operation = OP[command]
-    console.log(command, operation)
-    this.output.push(operation())
+    const code = isComparator(command)
+      ? operation(this.nextLabel('TRUE'), this.nextLabel('END'))
+      : operation()
+    this.output.push(code)
   }
 
   writePushPop (command, segment, index) {

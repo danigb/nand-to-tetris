@@ -1,27 +1,12 @@
 import { h, app } from 'hyperapp'
 const { Assembler } = require('../assembler')
+const { Disassembler } = require('../assembler/src/disassembler')
 import { Hack } from '../hack'
 var classNames = require('classnames')
 
 const PAD = '0000000000000000'
 const pad = (num) => PAD.slice(0, 16 - num.length) + num
 const toBinary = (i) => pad(i.toString(2))
-
-const EXAMPLE = `
-// This file is part of www.nand2tetris.org
-// and the book 'The Elements of Computing Systems'
-// by Nisan and Schocken, MIT Press.
-// File name: projects/06/add/Add.asm
-
-// Computes R0 = 2 + 3  (R0 refers to RAM[0])
-
-@2
-D=A
-@3
-D=D+A
-@0
-M=D
-`
 
 const log = (name, value, extra) => { console.log(name, value, extra || ''); return value }
 
@@ -87,21 +72,22 @@ const RAM = ({ hack, update }) => (
   </div>
 )
 
-const ROM = ({ hack, program, symbols }) => (
+const ROM = ({ hack, program, disassembled }) => (
   <div class='ROM'>
     <h2>ROM</h2>
     {program.map((instr, pos) => (
       <div class={classNames({ current: hack.PC === pos, inst: true })}>
         {pos}:&nbsp;
-        {instr}
+        {instr} {disassembled[pos]}
       </div>
     ))}
   </div>
 )
+const disassemble = (rom) => Disassembler.disassembly(rom)
 const Computer = ({ program, hack, actions }) => (
   <div>
     <CPU hack={hack} tick={actions.tick} update={actions.updateCPU} />
-    <ROM hack={hack} program={program} />
+    <ROM hack={hack} program={program} disassembled={disassemble(hack.rom)} />
     <RAM hack={hack} update={actions.updateRAM} />
   </div>
 )
@@ -117,5 +103,23 @@ const view = (model, actions) => (
 )
 
 app({
-  model: init(EXAMPLE), view, actions
+  model: init(example()), view, actions
 })
+
+function example () {
+  const EXAMPLE = `// This file is part of www.nand2tetris.org
+// and the book 'The Elements of Computing Systems'
+// by Nisan and Schocken, MIT Press.
+// File name: projects/06/add/Add.asm
+
+// Computes R0 = 2 + 3  (R0 refers to RAM[0])
+
+@2
+D=A
+@3
+D=D+A
+@0
+M=D
+`
+  return EXAMPLE
+}
